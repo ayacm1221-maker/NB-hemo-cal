@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1f4e78" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>Neonatal Hemodynamic Echo</title>
+  <style>
+    :root{
+      --navy:#1f4e78; --blue:#d9eaf7; --blue2:#5b9bd5;
+      --green:#e2f0d9; --orange:#fce4d6; --purple:#e4dfec;
+      --yellow:#fff2cc; --red:#f4cccc; --gray:#f5f7fa; --line:#d7dde5;
+      --text:#1f2937; --muted:#6b7280;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",Arial,sans-serif;background:#eef3f7;color:var(--text)}
+    header{position:sticky;top:0;z-index:10;background:var(--navy);color:white;padding:14px 16px;box-shadow:0 2px 8px #0002}
+    header h1{font-size:18px;margin:0} header p{font-size:12px;margin:4px 0 0;opacity:.86}
+    main{max-width:980px;margin:0 auto;padding:14px 12px 88px}
+    .card{background:white;border-radius:16px;padding:14px;margin:12px 0;box-shadow:0 2px 12px #0000000d;border:1px solid #e8edf2}
+    .section-title{font-weight:800;font-size:16px;margin:0 0 12px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    @media(max-width:680px){.grid{grid-template-columns:1fr}}
+    .field label{display:block;font-size:12px;color:var(--muted);margin:0 0 4px}
+    .input-wrap{display:flex;align-items:center;border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+    .input-wrap input{width:100%;border:0;outline:0;padding:11px 12px;font-size:16px;background:transparent}
+    .unit{padding:0 10px;font-size:12px;color:var(--muted);white-space:nowrap}
+    .plase-input{background:#fff8e8}
+    .result-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    @media(max-width:680px){.result-grid{grid-template-columns:1fr}}
+    .domain{border-left:6px solid;border-radius:14px;padding:12px;background:#fff}
+    .domain.preload{border-color:#5b9bd5;background:var(--blue)}
+    .domain.contractility{border-color:#70ad47;background:var(--green)}
+    .domain.afterload{border-color:#ed7d31;background:var(--orange)}
+    .domain.flow{border-color:#8064a2;background:var(--purple)}
+    .domain h3{margin:0 0 8px;font-size:15px}
+    .metric{display:grid;grid-template-columns:1fr auto;gap:8px;padding:7px 0;border-top:1px solid #ffffffaa}
+    .metric:first-of-type{border-top:0}.metric .name{font-size:13px}.metric .val{font-weight:800}
+    .sub{font-size:11px;color:#5e6673;margin-top:2px}
+    .pattern{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;margin:8px 0;background:white}
+    .badge{padding:5px 9px;border-radius:999px;font-weight:800;font-size:12px;background:#e5e7eb;color:#374151}
+    .badge.yes{background:var(--red);color:#8a1c1c}.badge.ok{background:#d9ead3;color:#274e13}
+    .risk{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px;border-radius:12px;margin:8px 0;background:#fff;border:1px solid var(--line)}
+    .risk .pct{font-size:22px;font-weight:900}.risk.low{background:#e8f5e4}.risk.mid{background:#fff6cf}.risk.high{background:#fde1df}
+    .small{font-size:12px;color:var(--muted);line-height:1.5}.warn{font-size:12px;line-height:1.55;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:10px}
+    .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:white;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom)}
+    .tabs button{border:0;background:white;padding:11px 4px;font-size:12px;color:#475569}.tabs button.active{color:var(--navy);font-weight:800;background:#eef5fb}
+    .page{display:none}.page.active{display:block}
+    .legend{display:flex;gap:8px;flex-wrap:wrap}.legend span{padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700}
+    .legend .p1{background:var(--blue)}.legend .p2{background:var(--green)}.legend .p3{background:var(--orange)}.legend .p4{background:var(--purple)}
+    button.reset{border:0;border-radius:12px;background:#e5e7eb;padding:10px 14px;font-weight:700}
+  </style>
+</head>
+<body>
+<header><h1>Neonatal Hemodynamic Echo</h1><p>床邊心超計算原型｜離線運算、不上傳資料</p></header>
+<main>
+  <section id="page-input" class="page active">
+    <div class="card">
+      <h2 class="section-title">Measurement Inputs</h2>
+      <div class="grid">
+        <div class="field"><label>Weight</label><div class="input-wrap"><input id="weight" type="number" inputmode="decimal"><span class="unit">g</span></div></div>
+        <div class="field"><label>Heart rate</label><div class="input-wrap"><input id="hr" type="number" inputmode="decimal"><span class="unit">bpm</span></div></div>
+        <div class="field"><label>LA area</label><div class="input-wrap"><input id="laArea" type="number" step="0.001" inputmode="decimal"><span class="unit">cm²</span></div></div>
+        <div class="field"><label>LA long-axis length</label><div class="input-wrap"><input id="laLen" type="number" step="0.1" inputmode="decimal"><span class="unit">mm</span></div></div>
+        <div class="field"><label>LA diameter</label><div class="input-wrap"><input id="laDiam" type="number" step="0.1" inputmode="decimal"><span class="unit">mm</span></div></div>
+        <div class="field"><label>Aortic diameter</label><div class="input-wrap"><input id="aoDiam" type="number" step="0.1" inputmode="decimal"><span class="unit">mm</span></div></div>
+        <div class="field"><label>LVDd</label><div class="input-wrap"><input id="lvdd" type="number" step="0.1" inputmode="decimal"><span class="unit">mm</span></div></div>
+        <div class="field"><label>LVDs</label><div class="input-wrap"><input id="lvds" type="number" step="0.1" inputmode="decimal"><span class="unit">mm</span></div></div>
+        <div class="field"><label>Hes (end-systolic posterior wall thickness)</label><div class="input-wrap"><input id="hes" type="number" step="0.1" inputmode="decimal"><span class="unit">mm</span></div></div>
+        <div class="field"><label>MAP / Pes</label><div class="input-wrap"><input id="map" type="number" step="0.1" inputmode="decimal"><span class="unit">mmHg</span></div></div>
+        <div class="field"><label>RR interval</label><div class="input-wrap"><input id="rr" type="number" step="0.001" inputmode="decimal"><span class="unit">sec</span></div></div>
+        <div class="field"><label>LVET</label><div class="input-wrap"><input id="lvet" type="number" step="0.001" inputmode="decimal"><span class="unit">sec</span></div></div>
+        <div class="field"><label>SVC diameter max</label><div class="input-wrap"><input id="svcMax" type="number" step="0.1" inputmode="decimal"><span class="unit">mm</span></div></div>
+        <div class="field"><label>SVC diameter min</label><div class="input-wrap"><input id="svcMin" type="number" step="0.1" inputmode="decimal"><span class="unit">mm</span></div></div>
+        <div class="field"><label>SVC VTI</label><div class="input-wrap"><input id="svcVti" type="number" step="0.1" inputmode="decimal"><span class="unit">cm</span></div></div>
+      </div>
+    </div>
+    <div class="card plase-input">
+      <h2 class="section-title">PLASE PDA Risk Inputs</h2>
+      <div class="grid">
+        <div class="field"><label>Gestational age (GA)</label><div class="input-wrap"><input id="ga" type="number" step="0.1" inputmode="decimal"><span class="unit">weeks</span></div></div>
+        <div class="field"><label>PDA diameter (PDAd)</label><div class="input-wrap"><input id="pdad" type="number" step="0.1" inputmode="decimal"><span class="unit">mm</span></div></div>
+        <div class="field"><label>LPA end-diastolic velocity</label><div class="input-wrap"><input id="lpaedv" type="number" step="0.1" inputmode="decimal"><span class="unit">cm/s</span></div></div>
+        <div class="field"><label>NT-proBNP (optional)</label><div class="input-wrap"><input id="ntp" type="number" step="1" inputmode="decimal"><span class="unit">pg/mL</span></div></div>
+      </div>
+      <p class="small">LA/Ao 會由上方 LA diameter / Aortic diameter 自動計算後帶入 PLASE。</p>
+    </div>
+    <button class="reset" onclick="resetAll()">清除所有輸入</button>
+  </section>
+
+  <section id="page-results" class="page">
+    <div class="card">
+      <h2 class="section-title">Hemodynamic Results</h2>
+      <div class="legend"><span class="p1">Preload</span><span class="p2">Contractility</span><span class="p3">Afterload</span><span class="p4">Systemic flow</span></div>
+      <div class="result-grid" style="margin-top:10px">
+        <div class="domain preload"><h3>Preload</h3>
+          <div class="metric"><div><div class="name">LAV</div><div class="sub">0.85 × Area² / Length</div></div><div class="val" id="r-lav">—</div></div>
+          <div class="metric"><div><div class="name">LAVI</div><div class="sub">~≥1.0 mL/kg caution</div></div><div class="val" id="r-lavi">—</div></div>
+          <div class="metric"><div><div class="name">LA/Ao</div><div class="sub">target 0.9–1.3</div></div><div class="val" id="r-laao">—</div></div>
+          <div class="metric"><div><div class="name">Expected LVDd</div><div class="sub">5.4 × kg + 7.1</div></div><div class="val" id="r-exp-lvdd">—</div></div>
+        </div>
+        <div class="domain contractility"><h3>Contractility</h3>
+          <div class="metric"><div><div class="name">LVFS</div><div class="sub">25–40%</div></div><div class="val" id="r-lvfs">—</div></div>
+          <div class="metric"><div><div class="name">LVEF</div><div class="sub">&lt;50% reduced</div></div><div class="val" id="r-lvef">—</div></div>
+          <div class="metric"><div><div class="name">mVcfc</div><div class="sub">&lt;0.8 circ/s reduced</div></div><div class="val" id="r-mvcfc">—</div></div>
+        </div>
+        <div class="domain afterload"><h3>Afterload</h3>
+          <div class="metric"><div><div class="name">ESWS</div><div class="sub">&gt;45 caution; &gt;60 high</div></div><div class="val" id="r-esws">—</div></div>
+        </div>
+        <div class="domain flow"><h3>Systemic flow</h3>
+          <div class="metric"><div><div class="name">Mean SVC diameter</div></div><div class="val" id="r-svcd">—</div></div>
+          <div class="metric"><div><div class="name">SVC flow</div><div class="sub">100–200; &lt;120 caution; &lt;50 severe low</div></div><div class="val" id="r-svcflow">—</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="page-patterns" class="page">
+    <div class="card"><h2 class="section-title">Bedside Pattern Recognition</h2>
+      <div class="pattern"><div><b>Possible volume / preload excess</b><div class="small">LAVI ≥1.0、LA/Ao ≥1.3 或 LVDd 高於體重預期值。</div></div><span id="p-preload" class="badge">—</span></div>
+      <div class="pattern"><div><b>Possible contractility insufficiency</b><div class="small">LVFS &lt;25%、LVEF &lt;50% 或 mVcfc &lt;0.8 circ/s。</div></div><span id="p-contract" class="badge">—</span></div>
+      <div class="pattern"><div><b>Possible afterload mismatch</b><div class="small">ESWS &gt;45 且 LVEF &lt;50% 或 mVcfc &lt;0.8。</div></div><span id="p-after" class="badge">—</span></div>
+      <div class="pattern"><div><b>Possible low systemic flow</b><div class="small">SVC flow &lt;120 mL/kg/min。</div></div><span id="p-flow" class="badge">—</span></div>
+      <div class="warn" style="margin-top:12px">這些 pattern 是決策支援提示，不是診斷。請結合 GA、日齡、血壓、PDA/MR、呼吸器條件、尿量、灌流與臨床變化。</div>
+    </div>
+  </section>
+
+  <section id="page-pda" class="page">
+    <div class="card"><h2 class="section-title">PDA Surgery Risk — PLASE</h2>
+      <div id="risk-v2" class="risk"><div><b>PLASE v2</b><div class="small">主要預測模型</div></div><div class="pct">—</div></div>
+      <div id="risk-v1" class="risk"><div><b>PLASE v1</b><div class="small">原始模型</div></div><div class="pct">—</div></div>
+      <div id="risk-ntp" class="risk"><div><b>NT-proBNP + GA</b><div class="small">替代模型</div></div><div class="pct">—</div></div>
+      <div class="warn">PLASE 是風險預測工具，不等同於手術適應症。仍需結合血流動力學、呼吸支持、器官灌流與治療反應。</div>
+    </div>
+  </section>
+</main>
+<nav class="tabs">
+  <button class="active" data-page="input">輸入</button>
+  <button data-page="results">結果</button>
+  <button data-page="patterns">Bedside</button>
+  <button data-page="pda">PDA Risk</button>
+</nav>
+<script>
+const ids=['weight','hr','laArea','laLen','laDiam','aoDiam','lvdd','lvds','hes','map','rr','lvet','svcMax','svcMin','svcVti','ga','pdad','lpaedv','ntp'];
+const $=id=>document.getElementById(id); const num=id=>{const v=parseFloat($(id).value); return Number.isFinite(v)?v:null};
+const fmt=(v,d=2,u='')=>Number.isFinite(v)?v.toFixed(d)+(u?' '+u:''):'—';
+function logistic(x){return 1/(1+Math.exp(-x))}
+function calc(){
+  const weightG=num('weight'), kg=weightG?weightG/1000:null, hr=num('hr'), area=num('laArea'), len=num('laLen'), la=num('laDiam'), ao=num('aoDiam'), lvdd=num('lvdd'), lvds=num('lvds'), hes=num('hes'), map=num('map'), rr=num('rr'), lvet=num('lvet'), smax=num('svcMax'), smin=num('svcMin'), vti=num('svcVti');
+  const lav=area&&len?0.85*area*area/(len/10):NaN;
+  const lavi=kg&&Number.isFinite(lav)?lav/kg:NaN;
+  const laao=la&&ao?la/ao:NaN;
+  const expLvdd=kg?5.4*kg+7.1:NaN;
+  const lvfs=lvdd&&lvds?((lvdd-lvds)/lvdd)*100:NaN;
+  const lvef=lvdd&&lvds?((Math.pow(lvdd,3)-Math.pow(lvds,3))/Math.pow(lvdd,3))*100:NaN;
+  const mvcfc=lvdd&&lvds&&rr&&lvet?((lvdd-lvds)/lvdd)*Math.sqrt(rr)/lvet:NaN;
+  const esws=lvds&&hes&&map?1.35*lvds*map/(4*hes*(1+hes/lvds)):NaN;
+  const svcd=smax&&smin?(smax+smin)/2:NaN;
+  const svcflow=kg&&hr&&vti&&Number.isFinite(svcd)?vti*Math.PI*Math.pow(svcd/10,2)/4*hr/kg:NaN;
+  $('r-lav').textContent=fmt(lav,3,'mL'); $('r-lavi').textContent=fmt(lavi,2,'mL/kg'); $('r-laao').textContent=fmt(laao,2); $('r-exp-lvdd').textContent=fmt(expLvdd,1,'mm');
+  $('r-lvfs').textContent=fmt(lvfs,1,'%'); $('r-lvef').textContent=fmt(lvef,1,'%'); $('r-mvcfc').textContent=fmt(mvcfc,2,'circ/s'); $('r-esws').textContent=fmt(esws,1,'g/cm²'); $('r-svcd').textContent=fmt(svcd,1,'mm'); $('r-svcflow').textContent=fmt(svcflow,0,'mL/kg/min');
+  setPattern('p-preload', (Number.isFinite(lavi)&&lavi>=1)||(Number.isFinite(laao)&&laao>=1.3)||(Number.isFinite(lvdd)&&Number.isFinite(expLvdd)&&lvdd>expLvdd));
+  setPattern('p-contract', (Number.isFinite(lvfs)&&lvfs<25)||(Number.isFinite(lvef)&&lvef<50)||(Number.isFinite(mvcfc)&&mvcfc<0.8));
+  setPattern('p-after', Number.isFinite(esws)&&esws>45&&((Number.isFinite(lvef)&&lvef<50)||(Number.isFinite(mvcfc)&&mvcfc<0.8)));
+  setPattern('p-flow', Number.isFinite(svcflow)&&svcflow<120);
+  const ga=num('ga'), pdad=num('pdad'), lpa=num('lpaedv'), ntp=num('ntp');
+  const v2=ga!=null&&pdad!=null&&lpa!=null&&Number.isFinite(laao)?logistic(12.5147+1.1608*pdad+0.0289*lpa+0.2176*laao-0.6119*ga):NaN;
+  const v1=ga!=null&&pdad!=null&&lpa!=null&&Number.isFinite(laao)?logistic(10.7091+1.1410*pdad+0.0360*lpa+0.6356*laao-0.5652*ga):NaN;
+  const ntm=ga!=null&&ntp&&ntp>0?logistic(10.9526+1.2185*Math.log10(ntp)-0.6740*ga):NaN;
+  setRisk('risk-v2',v2); setRisk('risk-v1',v1); setRisk('risk-ntp',ntm);
+  ids.forEach(id=>localStorage.setItem('neo_'+id,$(id).value));
+}
+function setPattern(id,yes){const e=$(id); if(yes){e.textContent='YES';e.className='badge yes'}else{e.textContent='—';e.className='badge ok'}}
+function setRisk(id,v){const e=$(id), pct=e.querySelector('.pct'); pct.textContent=Number.isFinite(v)?(v*100).toFixed(1)+'%':'—'; e.classList.remove('low','mid','high'); if(Number.isFinite(v)){e.classList.add(v>=.5?'high':v>=.2?'mid':'low')}}
+function resetAll(){ids.forEach(id=>{$(id).value=''; localStorage.removeItem('neo_'+id)});calc()}
+ids.forEach(id=>{$(id).value=localStorage.getItem('neo_'+id)||''; $(id).addEventListener('input',calc)});
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); $('page-'+b.dataset.page).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'})}));
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+calc();
+</script>
+</body>
+</html>
