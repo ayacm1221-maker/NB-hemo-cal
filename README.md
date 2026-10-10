@@ -22,3 +22,15 @@
 - 已同步更新 LAV、Expected LVDd、SVC flow、PLASE v1/v2、IOWA PDA size/weight 與 Bedside LVDd 門檻。
 - 已有舊版 localStorage 數值會在第一次開啟新版時由 mm 自動轉成 cm（只轉換一次）。
 - GitHub Pages：將本資料夾「內部所有檔案」上傳至 Repository 根目錄。
+
+
+## Report (2026-10-10)
+Added fifth tab: editable PDA/Hemodynamic report with detailed/brief modes and copy action.
+New fields: manual LVEF %, PDA shunt direction, PDA flow pattern. Manual LVEF overrides calculated LVEF when provided.
+PDA diameter blank is rendered as 'No PDA' by requested workflow convention, and is not proof of absence; always verify before pasting into clinical notes.
+
+## 本次更新
+- PDA report 改為精簡的逗號分隔單行格式，例如：`PDA (0.18cm, L->R, pulsatile), LA/Ao 1.5, Mitral E 85cm/s, IVRT 25ms`。
+- 未填入的量測項目不顯示；PDA 直徑未填時維持 `No PDA`。
+- PDA Risk（PLASE v1、v2、NT-proBNP + GA）完整移至 Bedside，移除獨立底部標籤。
+- 保留 Hemodynamic report、Impression、自訂編輯與複製功能。
