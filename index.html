@@ -43,8 +43,8 @@
     .risk{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px;border-radius:12px;margin:8px 0;background:#fff;border:1px solid var(--line)}
     .risk .pct{font-size:22px;font-weight:900}.risk.low{background:#e8f5e4}.risk.mid{background:#fff6cf}.risk.high{background:#fde1df}
     .small{font-size:12px;color:var(--muted);line-height:1.5}.warn{font-size:12px;line-height:1.55;background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:10px}
-    .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:white;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom)}
-    .tabs button{border:0;background:white;padding:11px 4px;font-size:12px;color:#475569}.tabs button.active{color:var(--navy);font-weight:800;background:#eef5fb}
+    .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:white;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding-bottom:env(safe-area-inset-bottom)}
+    .tabs button{min-width:0;width:100%;border:0;background:white;padding:11px 4px;font-size:12px;color:#475569}.tabs button.active{color:var(--navy);font-weight:800;background:#eef5fb}
     .page{display:none}.page.active{display:block}
     .legend{display:flex;gap:8px;flex-wrap:wrap}.legend span{padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700}
     .legend .p1{background:var(--blue)}.legend .p2{background:var(--green)}.legend .p3{background:var(--orange)}.legend .p4{background:var(--purple)}
@@ -357,6 +357,10 @@ function makeReport(c){
     Number.isFinite(c.lpa)?`LPAedv ${Number(c.lpa.toFixed(1))}cm/s`:null,
     Number.isFinite(c.lvdd)?`LVDd ${Number(c.lvdd.toFixed(2))}cm`:null
   ) : ['No PDA'];
+  // Display only complete, computable scores; never present partial IOWA as final.
+  if(Number.isFinite(c.plaseV2))pdaItems.push(`PLASE v2 ${Number((c.plaseV2*100).toFixed(1))}%`);
+  if(Number.isFinite(c.plaseNtpGa))pdaItems.push(`NT-proBNP + GA ${Number((c.plaseNtpGa*100).toFixed(1))}%`);
+  if(iowaReady)pdaItems.push(`IOWA ${iowa}/14`);
   const hemoGroups=[
     ['Preload',reportPick(reportLine('LA/Ao',c.laao),reportLine('LAV',c.lav,3,'mL'),reportLine('LAVI',c.lavi,2,'mL/kg'),reportLine('LVDd',c.lvdd,2,'cm'),reportLine('Expected LVDd',c.expLvdd,2,'cm'))],
     ['Contractility',reportPick(reportLine('LVFS',c.lvfs,1,'%'),reportLine('LVEF',c.lvef,1,'%'),reportLine('mVcfc',c.mvcfc,2,'circ/s'))],
@@ -449,7 +453,7 @@ function calc(){
   const ntm=ga!=null&&ntp&&ntp>0?logistic(10.9526+1.2185*Math.log10(ntp)-0.6740*ga):NaN;
   setRisk('risk-v2',v2); setRisk('risk-v1',v1); setRisk('risk-ntp',ntm);
   updateIowa({kg,laao,pdad,lpa,lavi,lvdd,mvcfc,esws});
-  updateReport({kg,laao,pdad,lpa,lavi,lvdd,lav,lvfs,lvef,mvcfc,esws,svcd,svcflow,expLvdd,hr});
+  updateReport({kg,laao,pdad,lpa,lavi,lvdd,lav,lvfs,lvef,mvcfc,esws,svcd,svcflow,expLvdd,hr,plaseV2:v2,plaseNtpGa:ntm});
   ids.forEach(id=>localStorage.setItem('neo_'+id,$(id).value));
 }
 function setPattern(id,yes){const e=$(id); if(yes){e.textContent='YES';e.className='badge yes'}else{e.textContent='—';e.className='badge ok'}}

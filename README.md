@@ -34,3 +34,11 @@ PDA diameter blank is rendered as 'No PDA' by requested workflow convention, and
 - 未填入的量測項目不顯示；PDA 直徑未填時維持 `No PDA`。
 - PDA Risk（PLASE v1、v2、NT-proBNP + GA）完整移至 Bedside，移除獨立底部標籤。
 - 保留 Hemodynamic report、Impression、自訂編輯與複製功能。
+
+## Report & Navigation update
+- 底部四個分頁平均分配寬度（各 25%）。
+- PDA report 於 PLASE v2 可計算時顯示其預測風險百分比。
+- 於 NT-proBNP + GA 可計算時顯示其預測風險百分比。
+- IOWA 七項資料全部可計算時才顯示總分（x/14），不顯示部分總分。
+- PLASE v1 不會出現在報告中；Bedside 的模型與原有計算規則均保留。
+- 注意：報告曾經手動修改時，按「重新產生」才能更新新分數。
