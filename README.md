@@ -42,3 +42,6 @@ PDA diameter blank is rendered as 'No PDA' by requested workflow convention, and
 - IOWA 七項資料全部可計算時才顯示總分（x/14），不顯示部分總分。
 - PLASE v1 不會出現在報告中；Bedside 的模型與原有計算規則均保留。
 - 注意：報告曾經手動修改時，按「重新產生」才能更新新分數。
+
+## PDA select styling
+PDA shunt direction 與 flow pattern 的選單已統一採用一般 measurement input 的邊框、圓角、字級、箭頭及 focus 樣式。無更動分數和報告計算。
