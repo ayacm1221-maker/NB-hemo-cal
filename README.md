@@ -15,3 +15,10 @@
 - 此版本是純前端靜態網頁，不需要伺服器或安裝相依套件。
 - 不需要將患者個人資訊輸入此 APP；欄位資料儲存於目前瀏覽器的 localStorage。
 - 為研發及測試版，臨床判讀規則須於正式使用前獨立驗證。
+
+
+## 2026-10-10 單位更新：mm → cm
+- LA length (A4C)、LVDd、LVDs、Hes、SVC diameter max/min、PDA diameter (PDAd) 改為 **cm** 輸入。
+- 已同步更新 LAV、Expected LVDd、SVC flow、PLASE v1/v2、IOWA PDA size/weight 與 Bedside LVDd 門檻。
+- 已有舊版 localStorage 數值會在第一次開啟新版時由 mm 自動轉成 cm（只轉換一次）。
+- GitHub Pages：將本資料夾「內部所有檔案」上傳至 Repository 根目錄。
