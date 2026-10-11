@@ -52,3 +52,15 @@ PDA shunt direction 與 flow pattern 的選單已統一採用一般 measurement 
 - Pulmonary vein D velocity 改為 cm/s，IOWA 門檻 30/50 cm/s；報告以一位小數顯示。
 - localStorage 已存舊值自動執行一次性轉換（ms→s、m/s→cm/s）；不更動其他公式。
 - 更新後對同一患者進行臨床使用前，仍請核對已存數值。
+
+
+## 2026-10-11 測量順序整合
+- 輸入頁新增「🧭 測量順序」捷徑按鈕，直接顯示使用者提供之總覽圖片。
+- 教學圖庫首張為 Workflow，後面八張原有教學圖維持原樣。
+- 手機顯示 Workflow 時可水平捲動瀏覽圖中文字。
+- IOWA、PLASE、Bedside、Report、前次單位換算規則均維持不變。
+
+
+## 本次更新
+- 已將測量順序圖替換為手機友善的直式版本（measurement_guides/00_echo_workflow.png）。
+- 其餘教學圖、計算功能、Report、Bedside 與分頁設定維持不變。

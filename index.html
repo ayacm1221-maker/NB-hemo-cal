@@ -57,12 +57,19 @@
     .guide-btn{border:1px solid #b8d3e9;background:#eaf4ff;color:#1f4e78;border-radius:9px;min-width:32px;min-height:30px;font-size:16px;font-weight:800;cursor:pointer;margin-left:6px}
     .guide-head{display:flex;align-items:center;justify-content:space-between;gap:6px}
     .guide-open{background:#1f4e78;color:#fff;border:0;border-radius:12px;padding:10px 12px;font-weight:700;cursor:pointer}
+    .guide-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+    .workflow-open{background:#087b75}
+    @media(max-width:600px){.guide-head{align-items:flex-start;flex-wrap:wrap}.guide-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.guide-open{font-size:12px;padding:11px 5px}}
     .guide-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
     .guide-tile{background:#f4f8fb;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:left;cursor:pointer;color:var(--text);font-weight:700}
     .guide-tile img{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;background:#fff;border-radius:8px;margin-bottom:8px}
     .guide-dialog{border:0;border-radius:15px;padding:12px;max-width:min(96vw,940px);max-height:94dvh;width:100%;box-shadow:0 18px 60px #0005}
     .guide-dialog::backdrop{background:#071d33c9}
+    .guide-image-wrap{overflow:auto;max-height:78dvh;overscroll-behavior:contain}
     .guide-dialog img{display:block;width:100%;height:auto;max-height:77dvh;object-fit:contain}
+    .guide-dialog.workflow-dialog{max-width:min(98vw,1500px)}
+    .guide-dialog.workflow-dialog img{width:100%;max-height:none}
+    @media(max-width:700px){.guide-dialog.workflow-dialog img{width:1100px;max-width:none}.guide-dialog.workflow-dialog .guide-image-wrap{max-height:72dvh}}
     .guide-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
     .guide-dialog-header h2{margin:0;font-size:16px}
     .guide-close{border:0;background:#e9edf2;border-radius:9px;padding:9px 14px;font-weight:700;cursor:pointer}
@@ -94,7 +101,7 @@
 <main>
   <section id="page-input" class="page active">
     <div class="card">
-      <div class="guide-head"><h2 class="section-title" style="margin:0">Measurement Inputs</h2><button class="guide-open" type="button" onclick="openGallery()">📖 測量教學圖庫</button></div>
+      <div class="guide-head"><h2 class="section-title" style="margin:0">Measurement Inputs</h2><div class="guide-actions"><button class="guide-open workflow-open" type="button" onclick="openGuide(8)">🧭 測量順序</button><button class="guide-open" type="button" onclick="openGallery()">📖 測量教學圖庫</button></div></div>
       <p class="small">點擊測量項目旁的 ⓘ 可直接查看對應的測量示意圖。</p>
       <div class="grid">
         <div class="field"><label>Weight</label><div class="input-wrap"><input id="weight" type="number" inputmode="decimal"><span class="unit">g</span></div></div>
@@ -226,13 +233,14 @@
   <section id="page-guides" class="page">
     <div class="card">
       <div class="guide-head"><h2 class="section-title" style="margin:0">Measurement Guide｜測量教學</h2><button type="button" class="guide-close" onclick="goPage('input')">返回輸入</button></div>
-      <p class="small">點擊圖片可放大檢視。目前共有八張測量示意圖。</p>
+      <p class="small">共有一張測量順序總覽與八張測量示意圖；點擊圖片可放大檢視。</p>
       <div id="guide-gallery" class="guide-gallery"></div>
     </div>
   </section>
   <dialog id="guide-dialog" class="guide-dialog" aria-labelledby="guide-dialog-title" onclick="if(event.target===this)this.close()">
     <div class="guide-dialog-header"><h2 id="guide-dialog-title"></h2><button class="guide-close" type="button" onclick="document.getElementById('guide-dialog').close()">關閉 ✕</button></div>
-    <img id="guide-large-img" alt="測量示意圖" />
+    <div class="guide-image-wrap"><img id="guide-large-img" alt="測量示意圖" /></div>
+    <p id="workflow-hint" class="small" hidden>手機可左右滑動查看全圖；關閉後可回到原輸入位置。</p>
   </dialog>
 </main>
 <nav class="tabs">
@@ -252,12 +260,13 @@ const guideData=[
  ['PDA 直徑與 LPA 舒張末期流速','measurement_guides/05_pda_lpa.png'],
  ['IVRT 等容舒張時間測量教學','measurement_guides/06_ivrt.png'],
  ['MV E wave 二尖瓣 E 波測量教學','measurement_guides/07_mv_e_wave.png'],
- ['Pulmonary vein D velocity 肺靜脈 D 波速度測量教學','measurement_guides/08_pulmonary_vein_d.png']
+ ['Pulmonary vein D velocity 肺靜脈 D 波速度測量教學','measurement_guides/08_pulmonary_vein_d.png'],
+ ['心臟超音波測量順序｜Workflow','measurement_guides/00_echo_workflow.png']
 ];
-function openGuide(index){const [title,src]=guideData[index];$('guide-dialog-title').textContent=title;const img=$('guide-large-img');img.src=src;img.alt=title;$('guide-dialog').showModal()}
+function openGuide(index){const [title,src]=guideData[index];$('guide-dialog-title').textContent=title;const img=$('guide-large-img');img.src=src;img.alt=title;const dialog=$('guide-dialog');dialog.classList.toggle('workflow-dialog',index===8);$('workflow-hint').hidden=index!==8;dialog.showModal();dialog.querySelector('.guide-image-wrap').scrollLeft=0}
 function goPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+name));document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.page===(name==='guides'?'input':name)));window.scrollTo({top:0,behavior:'smooth'})}
 function openGallery(){goPage('guides')}
-$('guide-gallery').innerHTML=guideData.map(([title,src],i)=>`<button type="button" class="guide-tile" onclick="openGuide(${i})"><img loading="lazy" src="${src}" alt="${title}"><span>${title}</span></button>`).join('');
+$('guide-gallery').innerHTML=[8,0,1,2,3,4,5,6,7].map(i=>{const [title,src]=guideData[i];return `<button type="button" class="guide-tile" onclick="openGuide(${i})"><img loading="lazy" src="${src}" alt="${title}"><span>${title}</span></button>`}).join('');
 
 const ids=['weight','hr','laArea','laLen','laaoInput','lvdd','lvds','hes','map','rr','lvet','svcMax','svcMin','svcVti','ga','pdad','lpaedv','ntp','mitralE','ivrt','pvD','lvo','rvo','flowDirection','lvefManual','pdaShunt','pdaPattern'];
 const num=id=>{const raw=$(id).value.trim(); if(raw==='')return null; const v=Number(raw); return Number.isFinite(v)?v:null};
