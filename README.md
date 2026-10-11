@@ -45,3 +45,10 @@ PDA diameter blank is rendered as 'No PDA' by requested workflow convention, and
 
 ## PDA select styling
 PDA shunt direction 與 flow pattern 的選單已統一採用一般 measurement input 的邊框、圓角、字級、箭頭及 focus 樣式。無更動分數和報告計算。
+
+
+## 單位更新（2026-10-11）
+- IVRT 改為秒（s），IOWA 門檻 0.030/0.050 s；報告以三位小數顯示。
+- Pulmonary vein D velocity 改為 cm/s，IOWA 門檻 30/50 cm/s；報告以一位小數顯示。
+- localStorage 已存舊值自動執行一次性轉換（ms→s、m/s→cm/s）；不更動其他公式。
+- 更新後對同一患者進行臨床使用前，仍請核對已存數值。

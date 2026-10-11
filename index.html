@@ -131,15 +131,15 @@
       <p class="small">以下為新增測量參數；LA/Ao、PDA 直徑與體重將自動沿用上方既有欄位。</p>
       <div class="grid">
         <div class="field"><label>Mitral E velocity <button class="guide-btn" type="button" aria-label="查看Mitral E velocity測量教學" onclick="openGuide(6)">ⓘ</button></label><div class="input-wrap"><input id="mitralE" type="number" min="0" step="0.1" inputmode="decimal"><span class="unit">cm/s</span></div></div>
-        <div class="field"><label>IVRT <button class="guide-btn" type="button" aria-label="查看IVRT測量教學" onclick="openGuide(5)">ⓘ</button></label><div class="input-wrap"><input id="ivrt" type="number" min="0" step="0.1" inputmode="decimal"><span class="unit">ms</span></div></div>
-        <div class="field"><label>Pulmonary vein D velocity <button class="guide-btn" type="button" aria-label="查看Pulmonary vein D velocity測量教學" onclick="openGuide(7)">ⓘ</button></label><div class="input-wrap"><input id="pvD" type="number" min="0" step="0.01" inputmode="decimal"><span class="unit">m/s</span></div></div>
+        <div class="field"><label>IVRT <button class="guide-btn" type="button" aria-label="查看IVRT測量教學" onclick="openGuide(5)">ⓘ</button></label><div class="input-wrap"><input id="ivrt" type="number" min="0" step="0.001" inputmode="decimal"><span class="unit">s</span></div></div>
+        <div class="field"><label>Pulmonary vein D velocity <button class="guide-btn" type="button" aria-label="查看Pulmonary vein D velocity測量教學" onclick="openGuide(7)">ⓘ</button></label><div class="input-wrap"><input id="pvD" type="number" min="0" step="0.1" inputmode="decimal"><span class="unit">cm/s</span></div></div>
         <div class="field"><label>LA:Ao ratio（共用）</label><div class="muted-value" id="iowa-laao">—（請填上方 LA/Ao）</div></div>
         <div class="field"><label>LVO</label><div class="input-wrap"><input id="lvo" type="number" min="0" step="0.1" inputmode="decimal"><span class="unit">mL/kg/min</span></div></div>
         <div class="field"><label>RVO</label><div class="input-wrap"><input id="rvo" type="number" min="0" step="0.1" inputmode="decimal"><span class="unit">mL/kg/min</span></div></div>
         <div class="field"><label>Aorta / peripheral flow</label><div class="input-wrap"><select id="flowDirection"><option value="">尚未選擇</option><option value="forward">Forward（順向）</option><option value="reverse">Reverse（逆向）</option></select></div></div>
         <div class="field"><label>PDA size / weight（自動計算）</label><div class="muted-value" id="iowa-pdasize">—（需輸入 PDA 直徑與體重）</div></div>
       </div>
-      <p class="small">LVO:RVO 以兩者相除；PDA size/weight = PDAd（cm）× 10 ÷ 體重（kg）。IOWA 滿分 14 分。Mitral E velocity、IVRT、Pulmonary vein D velocity 皆可點選欄位旁 ⓘ 查看教學圖。</p>
+      <p class="small">LVO:RVO 以兩者相除；PDA size/weight = PDAd（cm）× 10 ÷ 體重（kg）。IOWA 滿分 14 分。IVRT 門檻：0.030／0.050 s；Pulmonary vein D 門檻：30／50 cm/s。Mitral E velocity、IVRT、Pulmonary vein D velocity 皆可點選欄位旁 ⓘ 查看教學圖。</p>
     </div>
     <button class="reset" onclick="resetAll()">清除所有輸入</button>
   </section>
@@ -280,8 +280,8 @@ function updateIowa({kg,laao,pdad,lpa,lavi,lvdd,mvcfc,esws}){
   $('iowa-pdasize').textContent=Number.isFinite(pdaratio)?fmt(pdaratio,2,'mm/kg'):'—（需輸入 PDA 直徑與體重）';
   const checks=[
     ['Mitral E velocity',scoreByValue(e,45,80),fmt(e,1,'cm/s')],
-    ['IVRT',scoreByValue(ivrt,50,30,true),fmt(ivrt,1,'ms')],
-    ['Pulmonary vein D velocity',scoreByValue(pvd,0.3,0.5),fmt(pvd,2,'m/s')],
+    ['IVRT',scoreByValue(ivrt,0.050,0.030,true),fmt(ivrt,3,'s')],
+    ['Pulmonary vein D velocity',scoreByValue(pvd,30,50),fmt(pvd,1,'cm/s')],
     ['LA:Ao ratio',scoreByValue(laao,1.3,2.2),fmt(laao,2)],
     ['LVO:RVO ratio',scoreByValue(ratio,1.5,2.5),fmt(ratio,2)],
     ['Aorta/peripheral flow',direction==='forward'?0:direction==='reverse'?2:null,direction==='forward'?'Forward':direction==='reverse'?'Reverse':'—'],
@@ -340,7 +340,7 @@ function makeReport(c){
    ['Reverse aorta/peripheral flow',direction==='reverse']
   ].filter(x=>x[1]).map(x=>x[0]);
   const iowaFilled=[
-    scoreByValue(e,45,80),scoreByValue(ivrt,50,30,true),scoreByValue(pvd,0.3,0.5),
+    scoreByValue(e,45,80),scoreByValue(ivrt,0.050,0.030,true),scoreByValue(pvd,30,50),
     scoreByValue(c.laao,1.3,2.2),scoreByValue(ratio,1.5,2.5),
     direction==='forward'?0:direction==='reverse'?2:null,
     c.kg&&pdaPresent?scoreByValue(c.pdad*10/c.kg,1.5,3):null
@@ -357,8 +357,8 @@ function makeReport(c){
     pdaMain,
     Number.isFinite(c.laao)?`LA/Ao ${Number(c.laao.toFixed(2))}`:null,
     Number.isFinite(e)?`Mitral E ${Number(e.toFixed(1))}cm/s`:null,
-    Number.isFinite(ivrt)?`IVRT ${Number(ivrt.toFixed(1))}ms`:null,
-    Number.isFinite(pvd)?`PV D ${Number(pvd.toFixed(2))}m/s`:null,
+    Number.isFinite(ivrt)?`IVRT ${ivrt.toFixed(3)}s`:null,
+    Number.isFinite(pvd)?`PV D ${Number(pvd.toFixed(1))}cm/s`:null,
     Number.isFinite(ratio)?`LVO/RVO ${Number(ratio.toFixed(2))}`:null,
     Number.isFinite(c.lpa)?`LPAedv ${Number(c.lpa.toFixed(1))}cm/s`:null,
     Number.isFinite(c.lvdd)?`LVDd ${Number(c.lvdd.toFixed(2))}cm`:null
@@ -476,6 +476,17 @@ if(localStorage.getItem('neo_length_unit_version')!=='cm_v1'){
     }
   });
   localStorage.setItem('neo_length_unit_version','cm_v1');
+}
+// IOWA 輸入單位遷移：舊值 ivrt=ms、pvD=m/s，新值改為 s、cm/s。
+// 使用獨立版本標記，僅在首次載入新版時轉換一次。
+if(localStorage.getItem('neo_iowa_velocity_time_unit_version')!=='s_cms_v1'){
+  for(const [id,factor] of [['ivrt',0.001],['pvD',100]]){
+    const key='neo_'+id, old=localStorage.getItem(key);
+    if(old!==null&&old.trim()!==''&&Number.isFinite(Number(old))){
+      localStorage.setItem(key,String(Number(old)*factor));
+    }
+  }
+  localStorage.setItem('neo_iowa_velocity_time_unit_version','s_cms_v1');
 }
 ids.forEach(id=>{$(id).value=localStorage.getItem('neo_'+id)||''; $(id).addEventListener('input',calc); $(id).addEventListener('change',calc)});
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); $('page-'+b.dataset.page).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'})}));
