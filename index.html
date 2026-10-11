@@ -67,9 +67,20 @@
     .guide-dialog::backdrop{background:#071d33c9}
     .guide-image-wrap{overflow:auto;max-height:78dvh;overscroll-behavior:contain}
     .guide-dialog img{display:block;width:100%;height:auto;max-height:77dvh;object-fit:contain}
-    .guide-dialog.workflow-dialog{max-width:min(98vw,1500px)}
-    .guide-dialog.workflow-dialog img{width:100%;max-height:none}
-    @media(max-width:700px){.guide-dialog.workflow-dialog img{width:1100px;max-width:none}.guide-dialog.workflow-dialog .guide-image-wrap{max-height:72dvh}}
+    /* Workflow guide: fit the complete poster first; zoom is opt-in on every screen. */
+    .guide-dialog.workflow-dialog{width:min(94vw,560px);max-width:560px;max-height:92dvh;box-sizing:border-box}
+    .guide-dialog.workflow-dialog .guide-image-wrap{max-height:72dvh;text-align:center;overflow:auto;touch-action:pan-x pan-y}
+    .guide-dialog.workflow-dialog img{display:block;width:auto;max-width:100%;height:auto;max-height:70dvh;margin:0 auto;object-fit:contain}
+    .guide-dialog.workflow-dialog.workflow-zoom{width:min(96vw,850px);max-width:850px}
+    .guide-dialog.workflow-dialog.workflow-zoom img{width:850px;min-width:850px;max-width:none;max-height:none;height:auto}
+    .workflow-zoom-btn{border:1px solid #b8d3e9;background:#eaf4ff;border-radius:9px;padding:9px 11px;color:#1f4e78;font-weight:700;cursor:pointer}
+    .workflow-zoom-btn[hidden]{display:none}
+    @media(max-width:700px){
+      .guide-dialog.workflow-dialog{width:94vw;max-width:94vw;padding:10px}
+      .guide-dialog.workflow-dialog .guide-image-wrap{max-height:70dvh}
+      .guide-dialog.workflow-dialog img{max-height:67dvh}
+      .guide-dialog.workflow-dialog.workflow-zoom img{width:680px;min-width:680px}
+    }
     .guide-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
     .guide-dialog-header h2{margin:0;font-size:16px}
     .guide-close{border:0;background:#e9edf2;border-radius:9px;padding:9px 14px;font-weight:700;cursor:pointer}
@@ -238,9 +249,9 @@
     </div>
   </section>
   <dialog id="guide-dialog" class="guide-dialog" aria-labelledby="guide-dialog-title" onclick="if(event.target===this)this.close()">
-    <div class="guide-dialog-header"><h2 id="guide-dialog-title"></h2><button class="guide-close" type="button" onclick="document.getElementById('guide-dialog').close()">關閉 ✕</button></div>
+    <div class="guide-dialog-header"><h2 id="guide-dialog-title"></h2><div style="display:flex;gap:6px;align-items:center"><button id="workflow-zoom-btn" class="workflow-zoom-btn" type="button" hidden onclick="toggleWorkflowZoom()">放大查看</button><button class="guide-close" type="button" onclick="document.getElementById('guide-dialog').close()">關閉 ✕</button></div></div>
     <div class="guide-image-wrap"><img id="guide-large-img" alt="測量示意圖" /></div>
-    <p id="workflow-hint" class="small" hidden>手機可左右滑動查看全圖；關閉後可回到原輸入位置。</p>
+    <p id="workflow-hint" class="small" hidden>預設顯示完整圖片；需要閱讀細節時，可按「放大查看」並滑動圖片。</p>
   </dialog>
 </main>
 <nav class="tabs">
@@ -263,7 +274,26 @@ const guideData=[
  ['Pulmonary vein D velocity 肺靜脈 D 波速度測量教學','measurement_guides/08_pulmonary_vein_d.png'],
  ['心臟超音波測量順序｜Workflow','measurement_guides/00_echo_workflow.png']
 ];
-function openGuide(index){const [title,src]=guideData[index];$('guide-dialog-title').textContent=title;const img=$('guide-large-img');img.src=src;img.alt=title;const dialog=$('guide-dialog');dialog.classList.toggle('workflow-dialog',index===8);$('workflow-hint').hidden=index!==8;dialog.showModal();dialog.querySelector('.guide-image-wrap').scrollLeft=0}
+function openGuide(index){
+  const [title,src]=guideData[index];
+  $('guide-dialog-title').textContent=title;
+  const img=$('guide-large-img');img.src=src;img.alt=title;
+  const dialog=$('guide-dialog');
+  dialog.classList.toggle('workflow-dialog',index===8);
+  dialog.classList.remove('workflow-zoom');
+  $('workflow-zoom-btn').hidden=index!==8;
+  $('workflow-zoom-btn').textContent='放大查看';
+  $('workflow-hint').hidden=index!==8;
+  dialog.showModal();
+  const wrap=dialog.querySelector('.guide-image-wrap');
+  wrap.scrollLeft=0;wrap.scrollTop=0;
+}
+function toggleWorkflowZoom(){
+  const dialog=$('guide-dialog');
+  const zoom=dialog.classList.toggle('workflow-zoom');
+  $('workflow-zoom-btn').textContent=zoom?'縮小至全圖':'放大查看';
+  const wrap=dialog.querySelector('.guide-image-wrap');wrap.scrollLeft=0;wrap.scrollTop=0;
+}
 function goPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+name));document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.page===(name==='guides'?'input':name)));window.scrollTo({top:0,behavior:'smooth'})}
 function openGallery(){goPage('guides')}
 $('guide-gallery').innerHTML=[8,0,1,2,3,4,5,6,7].map(i=>{const [title,src]=guideData[i];return `<button type="button" class="guide-tile" onclick="openGuide(${i})"><img loading="lazy" src="${src}" alt="${title}"><span>${title}</span></button>`}).join('');

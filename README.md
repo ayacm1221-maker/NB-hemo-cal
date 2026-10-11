@@ -64,3 +64,9 @@ PDA shunt direction 與 flow pattern 的選單已統一採用一般 measurement 
 ## 本次更新
 - 已將測量順序圖替換為手機友善的直式版本（measurement_guides/00_echo_workflow.png）。
 - 其餘教學圖、計算功能、Report、Bedside 與分頁設定維持不變。
+
+
+## 圖片顯示改善
+- 測量順序圖預設依手機／桌面畫面縮放至可視高度（而非固定 1100px 寬），不需左右滑動即可看到全圖。
+- 點選「放大查看」才進入細節瀏覽模式，並可點「縮小至全圖」返回。
+- 九張圖片內容與其他 APP 計算功能均未修改。
