@@ -70,3 +70,8 @@ PDA shunt direction 與 flow pattern 的選單已統一採用一般 measurement 
 - 測量順序圖預設依手機／桌面畫面縮放至可視高度（而非固定 1100px 寬），不需左右滑動即可看到全圖。
 - 點選「放大查看」才進入細節瀏覽模式，並可點「縮小至全圖」返回。
 - 九張圖片內容與其他 APP 計算功能均未修改。
+
+
+## 本次更新
+- 已將「左房面積與長徑（A4C）」教學圖替換為使用者最新提供版本（measurement_guides/01_la_a4c.png）。
+- 其他教學圖、Workflow、Report、Bedside、IOWA、PLASE 與分頁設定均維持不變。
