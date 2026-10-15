@@ -104,6 +104,12 @@
     .report-actions button{padding:11px 14px;border:0;border-radius:10px;background:#1f4e78;color:#fff;font-weight:700;cursor:pointer}
     .report-actions button.secondary{background:#e9eff7;color:#1f4e78}
     .report-status{font-size:12px;color:#64748b;margin-top:8px}
+    .rv-input{background:#f1f8f8;border-color:#b5d9d6}
+    .rv-ref-note{background:#f6fafb;border:1px solid #d6e8e9;border-radius:12px;padding:12px;font-size:12px;line-height:1.65;color:#425466;margin-top:12px}
+    .rv-bedside-note{color:#7b8798;font-size:12px;font-weight:400;line-height:1.7;margin-top:9px;overflow-wrap:anywhere}
+    .rv-bedside-note > div + div{margin-top:2px}
+    .rv-result{border:1px solid #c4dedc;border-radius:13px;background:#f4fbfa;padding:12px;margin-top:10px}
+    .rv-result .metric{margin:0}
     .muted-value{background:#eef2f7;border-radius:8px;padding:9px 11px;font-size:13px;color:#475569}
   </style>
 </head>
@@ -159,6 +165,17 @@
       </div>
       <p class="small">LVO:RVO 以兩者相除；PDA size/weight = PDAd（cm）× 10 ÷ 體重（kg）。IOWA 滿分 14 分。IVRT 門檻：0.030／0.050 s；Pulmonary vein D 門檻：30／50 cm/s。Mitral E velocity、IVRT、Pulmonary vein D velocity 皆可點選欄位旁 ⓘ 查看教學圖。</p>
     </div>
+    <div class="card rv-input">
+      <h2 class="section-title">Right Ventricular Function｜右心室功能</h2>
+      <p class="small">TAPSE 及 RV Length 均以 cm 輸入；計算 cTAPSE 與年齡相符的 TAPSE Z-score。出生後日齡為參考值選擇的必要條件。</p>
+      <div class="grid">
+        <div class="field"><label>TAPSE <button class="guide-btn" type="button" aria-label="查看TAPSE測量教學" onclick="openGuide(9)">ⓘ</button></label><div class="input-wrap"><input id="tapse" type="number" min="0" step="0.01" inputmode="decimal"><span class="unit">cm</span></div></div>
+        <div class="field"><label>RV Length <button class="guide-btn" type="button" aria-label="查看RV Length測量教學" onclick="openGuide(9)">ⓘ</button></label><div class="input-wrap"><input id="rvLength" type="number" min="0" step="0.01" inputmode="decimal"><span class="unit">cm</span></div></div>
+        <div class="field"><label>Postnatal age (PNA)</label><div class="input-wrap"><input id="pnaDays" type="number" min="0" step="0.1" inputmode="decimal"><span class="unit">days</span></div><div class="small">出生後 48 小時 = 2.0 天，供參考模型自動切換。</div></div>
+        <div class="field"><label>Birth GA（共用）</label><div class="muted-value" id="rv-ga-reference">—（請輸入 PLASE 區塊的出生胎齡）</div></div>
+      </div>
+      <div class="rv-ref-note"><strong>Reference applicability:</strong> Koestenberger 2011 (GA 26–41 週，出生後 ≤48 小時)；Koestenberger 2009 (年齡分組、健康兒童；出生後 >48 小時且足月出生才顯示估算 Z-score)。超出適用範圍將顯示未提供經驗證之 Z-score。</div>
+    </div>
     <button class="reset" onclick="resetAll()">清除所有輸入</button>
   </section>
 
@@ -193,6 +210,24 @@
       <div id="iowa-breakdown"></div>
       <div id="iowa-interpretation" class="recommend">請輸入完整七項參數後判讀是否達到 ≥6 分。</div>
     </div>
+    <div class="card">
+      <h2 class="section-title">Right Ventricular Function｜TAPSE</h2>
+      <div class="result-grid">
+        <div class="domain flow"><h3>RV systolic function</h3>
+          <div class="metric"><div><div class="name">TAPSE</div></div><div class="val" id="r-tapse">—</div></div>
+          <div class="metric"><div><div class="name">cTAPSE</div><div class="sub">TAPSE / RV Length × 100%</div></div><div class="val" id="r-ctapse">—</div></div>
+          <div class="metric"><div><div class="name">TAPSE Z-score</div></div><div class="val" id="r-tapse-z">—</div></div>
+        </div>
+      </div>
+      <div id="r-tapse-reference" class="rv-ref-note">請輸入 TAPSE、出生胎齡與出生後日齡以選擇適合的參考資料。</div>
+      <div class="rv-ref-note" aria-label="cTAPSE 研究參考值">
+        <strong>cTAPSE｜研究參考值（非診斷門檻）</strong>
+        <div class="metric"><div><div class="name">出生後前 3 天｜極低出生體重兒</div><div class="sub">原始研究尚待核實；數值來自先前提供的書籍摘要</div></div><div class="val">25 ± 4%</div></div>
+        <div class="metric"><div><div class="name">出生後第 14 天｜無 PDA 早產兒組</div><div class="sub">Toyoshima et al., Pediatric Research (2024), Table 3</div></div><div class="val">38.0 ± 5.5%</div></div>
+        <p class="small" id="ctapse-reference-context">輸入 PNA（出生後日齡）可看到研究時間點提示。</p>
+        <p class="small">上述為不同研究族群的平均值 ± SD，不是所有新生兒的正常範圍；不據此計算 cTAPSE Z-score 或自動判斷 RV dysfunction。</p>
+      </div>
+    </div>
   </section>
 
   <section id="page-patterns" class="page">
@@ -201,6 +236,12 @@
       <div id="pda-bedside-indicators" class="recommend">等待輸入 PDA 評估相關數據。</div>
       <div id="pda-bedside-score" class="recommend">IOWA Score 尚未完成。</div>
       <div class="small">符合任一項：LPAedv &gt;15 cm/s、LA/Ao &gt;1.3、LAVI &gt;0.8 mL/kg、LVDd &gt;12 mm，或大動脈／周邊血流 Reverse → 提示考慮 PDA 治療。IOWA ≥6 → 建議評估治療。</div>
+    </div>
+    <div class="card">
+      <h2 class="section-title">Right Ventricular Function｜參考值</h2>
+      <div class="recommend"><div id="rv-bedside-values">尚未輸入 TAPSE。</div><div id="rv-bedside-note" class="rv-bedside-note">請輸入 TAPSE 與參考年齡資料。</div></div>
+      <div class="rv-ref-note" id="ctapse-bedside-reference">cTAPSE 研究參考：出生後前 3 天 VLBW 25 ± 4%（原始來源待確認）；第 14 天無 PDA 早產兒 38.0 ± 5.5%（Toyoshima 2024）。僅供比較。</div>
+      <p class="small">TAPSE 代表 RV 縱向收縮指標；Z-score 與 cTAPSE 不代表 RVEF，且不作為獨立的肺高壓診斷或治療依據。</p>
     </div>
     <div class="card">
       <h2 class="section-title">B. 循環管理建議</h2>
@@ -272,7 +313,8 @@ const guideData=[
  ['IVRT 等容舒張時間測量教學','measurement_guides/06_ivrt.png'],
  ['MV E wave 二尖瓣 E 波測量教學','measurement_guides/07_mv_e_wave.png'],
  ['Pulmonary vein D velocity 肺靜脈 D 波速度測量教學','measurement_guides/08_pulmonary_vein_d.png'],
- ['心臟超音波測量順序｜Workflow','measurement_guides/00_echo_workflow.png']
+ ['心臟超音波測量順序｜Workflow','measurement_guides/00_echo_workflow.png'],
+ ['TAPSE（三尖瓣環收縮期位移）測量教學','measurement_guides/09_tapse.png']
 ];
 function openGuide(index){
   const [title,src]=guideData[index];
@@ -296,13 +338,54 @@ function toggleWorkflowZoom(){
 }
 function goPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+name));document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.page===(name==='guides'?'input':name)));window.scrollTo({top:0,behavior:'smooth'})}
 function openGallery(){goPage('guides')}
-$('guide-gallery').innerHTML=[8,0,1,2,3,4,5,6,7].map(i=>{const [title,src]=guideData[i];return `<button type="button" class="guide-tile" onclick="openGuide(${i})"><img loading="lazy" src="${src}" alt="${title}"><span>${title}</span></button>`}).join('');
+$('guide-gallery').innerHTML=[8,9,0,1,2,3,4,5,6,7].map(i=>{const [title,src]=guideData[i];return `<button type="button" class="guide-tile" onclick="openGuide(${i})"><img loading="lazy" src="${src}" alt="${title}"><span>${title}</span></button>`}).join('');
 
-const ids=['weight','hr','laArea','laLen','laaoInput','lvdd','lvds','hes','map','rr','lvet','svcMax','svcMin','svcVti','ga','pdad','lpaedv','ntp','mitralE','ivrt','pvD','lvo','rvo','flowDirection','lvefManual','pdaShunt','pdaPattern'];
+const ids=['weight','hr','laArea','laLen','laaoInput','lvdd','lvds','hes','map','rr','lvet','svcMax','svcMin','svcVti','ga','pdad','lpaedv','ntp','mitralE','ivrt','pvD','lvo','rvo','flowDirection','lvefManual','pdaShunt','pdaPattern','tapse','rvLength','pnaDays'];
 const num=id=>{const raw=$(id).value.trim(); if(raw==='')return null; const v=Number(raw); return Number.isFinite(v)?v:null};
 const fmt=(v,d=2,u='')=>Number.isFinite(v)?v.toFixed(d)+(u?' '+u:''):'—';
 function logistic(x){return 1/(1+Math.exp(-x))}
 
+// TAPSE reference mode. 2011 cohort measured within 48 h of birth;
+// 2009 values are age-group observations, NOT a continuous age regression.
+function calculateTapseReference(tapse,rvLength,ga,pnaDays){
+  const tapseValid=Number.isFinite(tapse)&&tapse>=0;
+  const rvValid=Number.isFinite(rvLength)&&rvLength>0;
+  const ctapse=tapseValid&&rvValid?tapse/rvLength*100:NaN;
+  const base={tapse:tapseValid?tapse:NaN,rvLength:rvValid?rvLength:NaN,ctapse,
+    mean:NaN,z:NaN,lower:NaN,upper:NaN,source:'none',label:'',note:''};
+  if(!tapseValid){base.note='尚未輸入 TAPSE，無法計算參考 Z-score。';return base;}
+  if(!Number.isFinite(ga)||ga<=0||!Number.isFinite(pnaDays)||pnaDays<0){
+    base.note='請輸入出生胎齡及出生後日齡，才能選擇適合的 TAPSE 參考資料。';return base;
+  }
+  if(pnaDays<=2){
+    if(ga<26||ga>41){base.note='2011 新生兒胎齡模型適用範圍為約 26–41 週；目前不提供 Z-score。';return base;}
+    base.mean=-0.471+0.036*ga;
+    base.lower=base.mean-0.13;base.upper=base.mean+0.13;
+    base.z=(tapse-base.mean)/0.065;
+    base.source='2011';base.label='Koestenberger 2011 · GA-based';
+    base.note='Koestenberger 2011：出生後 ≤48 小時之新生兒胎齡模型；±2 SD 為回歸殘差 SD 推算。僅供參考，不單獨診斷 RV dysfunction。';
+    return base;
+  }
+  // 2009 cohort spans healthy children, and neonatal subgroup lacks GA-stratified
+  // preterm validation. Do not apply group Z-scores to preterm NICU infants.
+  if(ga<37){base.source='2009-inapplicable';base.label='Koestenberger 2009 · 參考限制';base.note='早產兒出生後 >48 小時：2009 健康兒童年齡分組未驗證此族群；不計算 TAPSE Z-score。可使用 TAPSE/cTAPSE 追蹤並綜合其他 RV 指標。';return base;}
+  // Group boundary ages approximate months in days; categorical comparisons only.
+  const groups=[
+    {max:30,mean:.91,low:.68,high:1.15,age:'0–30 days'},
+    {max:90,mean:1.14,low:.85,high:1.42,age:'1–3 months'},
+    {max:180,mean:1.31,low:1.01,high:1.65,age:'4–6 months'},
+    {max:365,mean:1.44,low:1.13,high:1.77,age:'7–12 months'}
+  ];
+  const grp=groups.find(g=>pnaDays<=g.max);
+  if(!grp){base.note='超過 12 個月：此 NICU 版本未載入較大年齡組 TAPSE 參考表，不計算 Z-score。';return base;}
+  base.mean=grp.mean;base.lower=grp.low;base.upper=grp.high;
+  // Each bounds are reported at ±2 SD; estimate group SD from full interval.
+  const sd=(grp.high-grp.low)/4;
+  base.z=(tapse-grp.mean)/sd;
+  base.source='2009';base.label='Koestenberger 2009 · grouped approximation ('+grp.age+')';
+  base.note='Koestenberger 2009：健康兒童 '+grp.age+' 組平均值與 ±2 SD。Z-score 以表格上下界估算組內 SD，非連續年齡或 BSA 模型；月份界線以 30/90/180/365 天近似。未經早產兒或重症 NICU 族群驗證。';
+  return base;
+}
 function scoreByValue(value, first, second, descending=false){
   if(!Number.isFinite(value)||value<0)return null;
   return descending ? (value>first?0:value>=second?1:2) : (value<first?0:value<=second?1:2);
@@ -409,6 +492,7 @@ function makeReport(c){
   const hemoGroups=[
     ['Preload',reportPick(reportLine('LA/Ao',c.laao),reportLine('LAV',c.lav,3,'mL'),reportLine('LAVI',c.lavi,2,'mL/kg'),reportLine('LVDd',c.lvdd,2,'cm'),reportLine('Expected LVDd',c.expLvdd,2,'cm'))],
     ['Contractility',reportPick(reportLine('LVFS',c.lvfs,1,'%'),reportLine('LVEF',c.lvef,1,'%'),reportLine('mVcfc',c.mvcfc,2,'circ/s'))],
+    ['Right ventricular function',reportPick(reportLine('TAPSE',c.tapse,2,'cm'),reportLine('RV Length',c.rvLength,2,'cm'),reportLine('cTAPSE',c.ctapse,1,'%'),Number.isFinite(c.tapseZ)?`TAPSE Z-score (${c.tapseRefLabel}): ${c.tapseZ.toFixed(2)}`:null)],
     ['Afterload',reportPick(reportLine('ESWS',c.esws,1,'g/cm²'))],
     ['Systemic flow',reportPick(reportLine('SVC diameter (mean)',c.svcd,2,'cm'),reportLine('SVC flow',c.svcflow,0,'mL/kg/min'),reportLine('LVO',lvo,1,'mL/kg/min'),reportLine('RVO',rvo,1,'mL/kg/min'),reportLine('LVO/RVO ratio',ratio),direction?`Aorta/peripheral flow: ${direction==='forward'?'Forward':'Reverse'}`:null)]
   ];
@@ -497,8 +581,39 @@ function calc(){
   const v1=ga!=null&&pdadMm!=null&&lpa!=null&&Number.isFinite(laao)?logistic(10.7091+1.1410*pdadMm+0.0360*lpa+0.6356*laao-0.5652*ga):NaN;
   const ntm=ga!=null&&ntp&&ntp>0?logistic(10.9526+1.2185*Math.log10(ntp)-0.6740*ga):NaN;
   setRisk('risk-v2',v2); setRisk('risk-v1',v1); setRisk('risk-ntp',ntm);
+  const tapse=num('tapse'),rvLength=num('rvLength'),pnaDays=num('pnaDays');
+  const rvAssessment=calculateTapseReference(tapse,rvLength,ga,pnaDays);
+  $('rv-ga-reference').textContent=Number.isFinite(ga)?fmt(ga,1,'weeks（出生胎齡）'):'—（請輸入 PLASE 區塊的出生胎齡）';
+  $('r-tapse').textContent=fmt(rvAssessment.tapse,2,'cm');
+  $('r-ctapse').textContent=fmt(rvAssessment.ctapse,1,'%');
+  $('r-tapse-z').textContent=Number.isFinite(rvAssessment.z)?(rvAssessment.z>=0?'+':'')+rvAssessment.z.toFixed(2):'—';
+  $('r-tapse-reference').textContent=(rvAssessment.label?rvAssessment.label+'｜':'')+rvAssessment.note;
+  const bedsideTapse=Number.isFinite(rvAssessment.tapse)?`TAPSE ${fmt(rvAssessment.tapse,2,'cm')}`:'尚未輸入 TAPSE';
+  const bedsideCtapse=Number.isFinite(rvAssessment.ctapse)?`；cTAPSE ${fmt(rvAssessment.ctapse,1,'%')}`:'';
+  const bedsideZ=Number.isFinite(rvAssessment.z)?`；TAPSE Z-score ${fmt(rvAssessment.z,2)}（${rvAssessment.label}）`:'';
+  $('rv-bedside-values').textContent=bedsideTapse+bedsideCtapse+bedsideZ+'。';
+  // Keep clinical reference caveats on distinct, muted lines for legibility.
+  const bedsideNote=$('rv-bedside-note');
+  bedsideNote.replaceChildren();
+  const noteLines=rvAssessment.source==='2011'
+    ? ['Koestenberger 2011：出生後 ≤48 小時之新生兒胎齡模型；',
+       '±2 SD 為回歸殘差 SD 推算。',
+       '僅供參考，不單獨診斷 RV dysfunction。']
+    : [rvAssessment.note];
+  noteLines.forEach(line=>{const div=document.createElement('div');div.textContent=line;bedsideNote.appendChild(div);});
+  // These are descriptive research-group averages; do not derive Z-scores or diagnostic thresholds.
+  const ctContext=!Number.isFinite(pnaDays)||pnaDays<0
+    ?'尚未輸入出生後日齡；兩組研究參考皆列出，但不指定適用組。'
+    :pnaDays>=0&&pnaDays<3
+      ?'目前為出生後前 3 天；25 ± 4% 研究時間點相近，但仍須符合原研究族群（VLBW）；原始出處待核。'
+      :pnaDays>=14&&pnaDays<15
+        ?'目前為出生後第 14 天；38.0 ± 5.5% 組為無 PDA 早產兒，若病人有 PDA 或臨床狀態不同，不能直接視為正常值。'
+        :'目前日齡不完全對應上述研究時間點；兩組均僅供背景比較。';
+  $('ctapse-reference-context').textContent=ctContext;
+  $('ctapse-bedside-reference').textContent='cTAPSE 研究參考：出生後前 3 天 VLBW 25 ± 4%（原始來源待核）；出生後第 14 天無 PDA 早產兒 38.0 ± 5.5%（Toyoshima 2024）。'+ctContext+' 不作診斷或治療門檻。';
+
   updateIowa({kg,laao,pdad,lpa,lavi,lvdd,mvcfc,esws});
-  updateReport({kg,laao,pdad,lpa,lavi,lvdd,lav,lvfs,lvef,mvcfc,esws,svcd,svcflow,expLvdd,hr,plaseV2:v2,plaseNtpGa:ntm});
+  updateReport({kg,laao,pdad,lpa,lavi,lvdd,lav,lvfs,lvef,mvcfc,esws,svcd,svcflow,expLvdd,hr,plaseV2:v2,plaseNtpGa:ntm,tapse:rvAssessment.tapse,rvLength:rvAssessment.rvLength,ctapse:rvAssessment.ctapse,tapseZ:rvAssessment.z,tapseRefLabel:rvAssessment.label});
   ids.forEach(id=>localStorage.setItem('neo_'+id,$(id).value));
 }
 function setPattern(id,yes){const e=$(id); if(yes){e.textContent='YES';e.className='badge yes'}else{e.textContent='—';e.className='badge ok'}}

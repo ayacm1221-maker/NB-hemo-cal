@@ -75,3 +75,38 @@ PDA shunt direction 與 flow pattern 的選單已統一採用一般 measurement 
 ## 本次更新
 - 已將「左房面積與長徑（A4C）」教學圖替換為使用者最新提供版本（measurement_guides/01_la_a4c.png）。
 - 其他教學圖、Workflow、Report、Bedside、IOWA、PLASE 與分頁設定均維持不變。
+
+
+## TAPSE / cTAPSE / Z-score (2026-10-14)
+- 輸入 TAPSE、RV Length（均 cm）及 PNA（天），原本 GA 欄位共用為出生胎齡。
+- 出生後 ≤2 天且出生 GA 26–41 週：Koestenberger et al. Neonatology 2011 模型：TAPSE_pred (cm) = -0.471 + 0.036 × GA（週）；Z = (TAPSE - TAPSE_pred)/0.065。
+- 出生後 >2 天且出生 GA ≥37 週：Koestenberger et al. JASE 2009 年齡分組：0–30 天、1–3 月、4–6 月、7–12 月。以文獻 Table 1 平均值與 ±2 SD 推估 SD=(upper−lower)/4，僅估算組內 Z，不代表連續年齡模型。
+- 早產兒出生後 >2 天及其他超出研究族群者：不輸出 Z-score，不將 2009 健康兒童表格當作已驗證的 NICU 早產兒標準。
+- cTAPSE = TAPSE(cm)/RV Length(cm)×100%，此數值不使用一般 TAPSE Z-score 評估。
+- Results、Bedside 和 Hemodynamic Report 同步顯示可計算項目；舊 PDA / PLASE / IOWA 演算法保持原樣。
+- 參考論文：Koestenberger et al. Neonatology 2011;100:85–92. DOI:10.1159/000322006；Koestenberger et al. J Am Soc Echocardiogr 2009;22:715–719. DOI:10.1016/j.echo.2009.03.026。
+- 本工具用於臨床決策輔助，TAPSE 非右心室射出分率的直接替代值。
+
+
+## cTAPSE 研究參考值
+- Results 和 Bedside 同時列出：出生後前 3 天極低出生體重兒 cTAPSE 25 ± 4%（先前提供之書籍摘要，原始研究尚待核實）。
+- 出生後第 14 天無 PDA 早產兒 cTAPSE 38.0 ± 5.5%（Toyoshima et al., Pediatric Research 2024, Table 3）。
+- 依 PNA 顯示研究時間點的適用性提示，但不因此直接認定個別病人符合研究收案條件。
+- 不計算 cTAPSE Z-score，不將上述 SD 值作為正常／異常或治療門檻；TAPSE 2011/2009 的 Z-score 計算維持不變。
+
+
+## 本次版面調整
+- Right Ventricular Function 輸入區塊移至輸入分頁最後，置於「清除所有輸入」按鈕之前。
+- Results 的右心室區塊只列 TAPSE、cTAPSE、TAPSE Z-score 三項，保留原有參考資訊。
+- Bedside 的 Koestenberger 2011 參考說明改為三行淺灰色小字，與數值分開顯示。
+- 所有臨床計算式、Report 與測量圖保持不變。
+
+
+## Results 排序調整
+Results 分頁依序顯示 Hemodynamic Results、IOWA Score、Right Ventricular Function｜TAPSE（最下方），未修改計算邏輯。
+
+
+## 本次更新
+- 新增「TAPSE（三尖瓣環收縮期位移）測量教學」圖片，並連結到 TAPSE 與 RV Length 欄位旁的 ⓘ 按鈕。
+- 教學圖庫新增 TAPSE 教學圖，圖庫順序為 Workflow、TAPSE、其他測量教學圖。
+- 已將 PDA / LPA 教學圖（measurement_guides/05_pda_lpa.png）替換為最新版本。
