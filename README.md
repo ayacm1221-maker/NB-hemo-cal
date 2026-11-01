@@ -110,3 +110,13 @@ Results 分頁依序顯示 Hemodynamic Results、IOWA Score、Right Ventricular 
 - 新增「TAPSE（三尖瓣環收縮期位移）測量教學」圖片，並連結到 TAPSE 與 RV Length 欄位旁的 ⓘ 按鈕。
 - 教學圖庫新增 TAPSE 教學圖，圖庫順序為 Workflow、TAPSE、其他測量教學圖。
 - 已將 PDA / LPA 教學圖（measurement_guides/05_pda_lpa.png）替換為最新版本。
+
+
+## Report 更新（2026-11）
+- Brief Report 使用 Heart echo report 格式：PDA、LA/Ao、LAVI、LVEF、PLASE v2、完整 IOWA 總分；mVcfc/ESWS 與對應 Bedside 判讀；有數值才列出 SVC flow；RV 僅列 TAPSE/cTAPSE。
+- Detailed Report 保持原有格式；Brief 不重複 Impression。
+- 修正複製按鈕：同步選取與複製、Clipboard API 備援，權限受限時保留選取狀態。
+
+
+### Input order update (2026-11-02)
+Measurement Inputs: Weight → Heart rate → MAP / Pes → PDAd → PDA shunt direction → PDA flow pattern → remaining measurements. PLASE repeats PDA values only as non-editable shared-value summaries. All calculation IDs and persistence keys are unchanged.
