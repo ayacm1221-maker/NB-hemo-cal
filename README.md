@@ -120,3 +120,9 @@ Results 分頁依序顯示 Hemodynamic Results、IOWA Score、Right Ventricular 
 
 ### Input order update (2026-11-02)
 Measurement Inputs: Weight → Heart rate → MAP / Pes → PDAd → PDA shunt direction → PDA flow pattern → remaining measurements. PLASE repeats PDA values only as non-editable shared-value summaries. All calculation IDs and persistence keys are unchanged.
+
+
+## Excel 資料匯出（本版新增）
+Results 最下方可複製 TSV 欄名＋本次資料，或僅複製資料列；可另下載含 BOM 的 CSV。單列包含固定欄序的原始輸入和計算結果。未輸入或無法計算者留空；IOWA 只有完整七項才匯出總分。所有處理在本機，不會在 App 內儲存歷史資料。
+
+- 將 LVEF (measured, optional) 移到 LVDd 之前，計算與匯出行為不變。

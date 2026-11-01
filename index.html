@@ -111,6 +111,16 @@
     .rv-result{border:1px solid #c4dedc;border-radius:13px;background:#f4fbfa;padding:12px;margin-top:10px}
     .rv-result .metric{margin:0}
     .muted-value{background:#eef2f7;border-radius:8px;padding:9px 11px;font-size:13px;color:#475569}
+
+    .excel-tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+    .excel-tools button{border:0;border-radius:10px;padding:11px 14px;background:#167c79;color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+    .excel-tools button.secondary{background:#e6f3f3;color:#116662}
+    .excel-preview{overflow-x:auto;border:1px solid #d4e5e6;border-radius:10px;max-width:100%}
+    .excel-preview table{border-collapse:collapse;min-width:1100px;width:max-content;font-size:12px;white-space:nowrap}
+    .excel-preview th,.excel-preview td{padding:10px 12px;border-bottom:1px solid #e2ecef;border-right:1px solid #e2ecef;text-align:left}
+    .excel-preview th{background:#eaf6f5;color:#235955;font-weight:700}
+    .excel-preview td{background:white;color:#263a4a}
+    .excel-status{font-size:12px;color:#64748b;line-height:1.6;min-height:20px}
   </style>
 </head>
 <body>
@@ -130,9 +140,9 @@
         <div class="field"><label>LA area <button class="guide-btn" type="button" aria-label="查看LA area測量教學" onclick="openGuide(0)">ⓘ</button></label><div class="input-wrap"><input id="laArea" type="number" step="0.001" inputmode="decimal"><span class="unit">cm²</span></div></div>
         <div class="field"><label>LA length (A4C) <button class="guide-btn" type="button" aria-label="查看LA length (A4C)測量教學" onclick="openGuide(0)">ⓘ</button></label><div class="input-wrap"><input id="laLen" type="number" step="0.01" inputmode="decimal"><span class="unit">cm</span></div></div>
         <div class="field"><label>LA/Ao <button class="guide-btn" type="button" aria-label="查看LA/Ao測量教學" onclick="openGuide(2)">ⓘ</button></label><div class="input-wrap"><input id="laaoInput" type="number" step="0.01" inputmode="decimal"><span class="unit">ratio</span></div></div>
+        <div class="field"><label>LVEF (measured, optional)</label><div class="input-wrap"><input id="lvefManual" type="number" min="0" max="100" step="0.1" inputmode="decimal"><span class="unit">%</span></div><div class="small">留空則採用 LVDd/LVDs 計算值；填寫時優先使用測量值。</div></div>
         <div class="field"><label>LVDd <button class="guide-btn" type="button" aria-label="查看LVDd測量教學" onclick="openGuide(1)">ⓘ</button></label><div class="input-wrap"><input id="lvdd" type="number" step="0.01" inputmode="decimal"><span class="unit">cm</span></div></div>
         <div class="field"><label>LVDs <button class="guide-btn" type="button" aria-label="查看LVDs測量教學" onclick="openGuide(1)">ⓘ</button></label><div class="input-wrap"><input id="lvds" type="number" step="0.01" inputmode="decimal"><span class="unit">cm</span></div></div>
-        <div class="field"><label>LVEF (measured, optional)</label><div class="input-wrap"><input id="lvefManual" type="number" min="0" max="100" step="0.1" inputmode="decimal"><span class="unit">%</span></div><div class="small">留空則採用 LVDd/LVDs 計算值；填寫時優先使用測量值。</div></div>
         <div class="field"><label>Hes (end-systolic posterior wall thickness) <button class="guide-btn" type="button" aria-label="查看Hes (end-systolic posterior wall thickness)測量教學" onclick="openGuide(1)">ⓘ</button></label><div class="input-wrap"><input id="hes" type="number" step="0.01" inputmode="decimal"><span class="unit">cm</span></div></div>
         <div class="field"><label>RR interval <button class="guide-btn" type="button" aria-label="查看RR interval測量教學" onclick="openGuide(1)">ⓘ</button></label><div class="input-wrap"><input id="rr" type="number" step="0.001" inputmode="decimal"><span class="unit">sec</span></div></div>
         <div class="field"><label>LVET <button class="guide-btn" type="button" aria-label="查看LVET測量教學" onclick="openGuide(1)">ⓘ</button></label><div class="input-wrap"><input id="lvet" type="number" step="0.001" inputmode="decimal"><span class="unit">sec</span></div></div>
@@ -230,6 +240,19 @@
         <p class="small" id="ctapse-reference-context">輸入 PNA（出生後日齡）可看到研究時間點提示。</p>
         <p class="small">上述為不同研究族群的平均值 ± SD，不是所有新生兒的正常範圍；不據此計算 cTAPSE Z-score 或自動判斷 RV dysfunction。</p>
       </div>
+    </div>
+    <div class="card" id="excel-export-card">
+      <h2 class="section-title">Excel 資料匯出｜研究記錄</h2>
+      <p class="small">每次檢查一列；包含原始輸入、計算結果及記錄時間。下方為重要欄位預覽；複製時會輸出全部欄位。空白表示未輸入或無法計算，數字不附單位（單位寫在欄名）。</p>
+      <div class="excel-preview" role="region" aria-label="Excel 欄位預覽" tabindex="0"><table><thead id="excel-preview-head"></thead><tbody id="excel-preview-body"></tbody></table></div>
+      <div class="excel-tools">
+        <button id="excel-copy-all" type="button">📋 複製欄名＋本次資料</button>
+        <button id="excel-copy-row" type="button" class="secondary">📋 只複製資料列</button>
+        <button id="excel-download" type="button" class="secondary">⬇ 下載 CSV</button>
+      </div>
+      <div class="excel-status" id="excel-status" role="status">第一次貼到 Excel A1 請選「欄名＋本次資料」；以後新增紀錄可用「只複製資料列」，貼到下一個空白列。</div>
+      <textarea id="excel-fallback" hidden aria-label="手動複製 Excel 資料" readonly style="width:100%;height:85px"></textarea>
+      <p class="small">使用 Tab 分隔欄位，可直接貼入 Excel／Google Sheets。匯出內容僅由本機產生，不會上傳伺服器。此區不會儲存歷次資料，請自行妥善保存檔案與去識別化。</p>
     </div>
   </section>
 
@@ -603,6 +626,66 @@ $('report-copy').addEventListener('click',async()=>{
   }
 });
 
+
+// Fixed-schema, analysis-friendly one-visit-per-row export. No patient identifiers are collected.
+const excelInputColumns=[
+ ['weight','Weight_g'],['ga','GA_weeks'],['pnaDays','PNA_days'],['hr','Heart_rate_bpm'],['map','MAP_Pes_mmHg'],
+ ['pdad','PDAd_cm'],['pdaShunt','PDA_shunt_direction'],['pdaPattern','PDA_flow_pattern'],
+ ['laArea','LA_area_cm2'],['laLen','LA_length_cm'],['laaoInput','LA_Ao_ratio'],['lvdd','LVDd_cm'],['lvds','LVDs_cm'],
+ ['lvefManual','LVEF_measured_pct'],['hes','Hes_cm'],['rr','RR_interval_s'],['lvet','LVET_s'],
+ ['svcMax','SVC_diameter_max_cm'],['svcMin','SVC_diameter_min_cm'],['svcVti','SVC_VTI_cm'],
+ ['lpaedv','LPA_edv_cm_per_s'],['ntp','NT_proBNP_pg_per_mL'],
+ ['mitralE','Mitral_E_cm_per_s'],['ivrt','IVRT_s'],['pvD','Pulmonary_vein_D_cm_per_s'],
+ ['lvo','LVO_mL_per_kg_min'],['rvo','RVO_mL_per_kg_min'],['flowDirection','Aorta_peripheral_flow'],
+ ['tapse','TAPSE_cm'],['rvLength','RV_length_cm']
+];
+const excelDerivedColumns=[
+ 'LAV_mL','LAVI_mL_per_kg','Expected_LVDd_cm','LVFS_pct','LVEF_pct','mVcfc_circ_per_s','ESWS_g_per_cm2',
+ 'SVC_diameter_mean_cm','SVC_flow_mL_per_kg_min','LVO_RVO_ratio','PDAd_mm_per_kg',
+ 'PLASE_v1_pct','PLASE_v2_pct','NT_proBNP_GA_risk_pct','IOWA_score_out_of_14',
+ 'IOWA_complete_7_of_7','cTAPSE_pct','TAPSE_Z_score','TAPSE_reference'
+];
+const excelHeaders=['Recorded_at_local',...excelInputColumns.map(x=>x[1]),...excelDerivedColumns];
+const excelPreviewFields=['Recorded_at_local','Weight_g','GA_weeks','PNA_days','PDAd_cm','LA_Ao_ratio','LAVI_mL_per_kg','LVEF_pct','PLASE_v2_pct','IOWA_score_out_of_14','mVcfc_circ_per_s','ESWS_g_per_cm2','SVC_flow_mL_per_kg_min','TAPSE_cm','cTAPSE_pct'];
+let excelValues={};
+const exportNum=(v,d)=>Number.isFinite(v)?Number(v.toFixed(d)):'';
+function localExportTime(){const d=new Date();const pad=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;}
+function excelSnapshot(){
+  const data={Recorded_at_local:localExportTime()};
+  for(const [id,key] of excelInputColumns){const el=$(id);data[key]=el.value===''?'':(el.tagName==='SELECT'?el.value:(Number.isFinite(Number(el.value))?Number(el.value):''));}
+  Object.assign(data,excelValues);
+  return data;
+}
+function excelTsv(data,withHeader){const line=excelHeaders.map(k=>String(data[k]??'').replace(/[\t\r\n]/g,' ')).join('\t');return withHeader?excelHeaders.join('\t')+'\n'+line:line;}
+function refreshExcelPreview(){
+  const data=excelSnapshot();
+  const thead=$('excel-preview-head'),tbody=$('excel-preview-body');
+  thead.replaceChildren();tbody.replaceChildren();
+  const hr=document.createElement('tr'),tr=document.createElement('tr');
+  for(const k of excelPreviewFields){const th=document.createElement('th');th.textContent=k;hr.appendChild(th);const td=document.createElement('td');td.textContent=String(data[k]??'');tr.appendChild(td);}
+  thead.appendChild(hr);tbody.appendChild(tr);
+}
+async function copyExcelText(value){
+  // Try synchronous copy first so embedded/in-app browsers retain click gesture.
+  const helper=document.createElement('textarea');helper.value=value;helper.style.position='fixed';helper.style.top='0';helper.style.left='-9999px';document.body.appendChild(helper);helper.focus();helper.select();
+  let ok=false;
+  try{ok=!!(document.execCommand&&document.execCommand('copy'));}catch(e){}
+  helper.remove();
+  if(!ok&&navigator.clipboard&&navigator.clipboard.writeText){try{await navigator.clipboard.writeText(value);ok=true;}catch(e){}}
+  if(!ok){const fallback=$('excel-fallback');if(fallback){fallback.value=value;fallback.hidden=false;fallback.focus();fallback.select();}}
+  $('excel-status').textContent=ok?'複製成功！請到 Excel／Google Sheets 選取起始儲存格後貼上。':'瀏覽器禁止自動複製：下方已選取內容，請長按複製或 Ctrl/Cmd+C。';
+}
+$('excel-copy-all').addEventListener('click',()=>copyExcelText(excelTsv(excelSnapshot(),true)));
+$('excel-copy-row').addEventListener('click',()=>copyExcelText(excelTsv(excelSnapshot(),false)));
+$('excel-download').addEventListener('click',()=>{
+  const data=excelSnapshot();
+  const csvCell=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const csv=[excelHeaders.map(csvCell).join(','),excelHeaders.map(k=>csvCell(data[k])).join(',')].join('\r\n');
+  const blob=new Blob(['\ufeff',csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='neonatal_echo_'+data.Recorded_at_local.replace(/[ :]/g,'-')+'.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  $('excel-status').textContent='已要求瀏覽器下載 CSV（含欄名與本次資料）。';
+});
+
 function calc(){
   const weightG=num('weight'), kg=weightG>0?weightG/1000:null, hr=num('hr'), area=num('laArea'), len=num('laLen'), laao=num('laaoInput'), lvdd=num('lvdd'), lvds=num('lvds'), hes=num('hes'), map=num('map'), rr=num('rr'), lvet=num('lvet'), smax=num('svcMax'), smin=num('svcMin'), vti=num('svcVti');
   const lav=area&&len?0.85*area*area/len:NaN;
@@ -667,6 +750,19 @@ function calc(){
 
   updateIowa({kg,laao,pdad,lpa,lavi,lvdd,mvcfc,esws});
   updateReport({kg,laao,pdad,lpa,lavi,lvdd,lav,lvfs,lvef,mvcfc,esws,svcd,svcflow,expLvdd,hr,plaseV2:v2,plaseNtpGa:ntm,tapse:rvAssessment.tapse,rvLength:rvAssessment.rvLength,ctapse:rvAssessment.ctapse,tapseZ:rvAssessment.z,tapseRefLabel:rvAssessment.label});
+  const lvo=num('lvo'),rvo=num('rvo'),lvoRvo=lvo>0&&rvo>0?lvo/rvo:NaN;
+  const iowaValues=[scoreByValue(num('mitralE'),45,80),scoreByValue(num('ivrt'),0.050,0.030,true),scoreByValue(num('pvD'),30,50),scoreByValue(laao,1.3,2.2),scoreByValue(lvoRvo,1.5,2.5),$('flowDirection').value==='forward'?0:$('flowDirection').value==='reverse'?2:null,scoreByValue(kg>0&&pdad!=null?pdad*10/kg:NaN,1.5,3)];
+  const iowaComplete=iowaValues.every(v=>v!==null);
+  excelValues={
+    LAV_mL:exportNum(lav,3),LAVI_mL_per_kg:exportNum(lavi,3),Expected_LVDd_cm:exportNum(expLvdd,2),
+    LVFS_pct:exportNum(lvfs,1),LVEF_pct:exportNum(lvef,1),mVcfc_circ_per_s:exportNum(mvcfc,2),ESWS_g_per_cm2:exportNum(esws,1),
+    SVC_diameter_mean_cm:exportNum(svcd,2),SVC_flow_mL_per_kg_min:exportNum(svcflow,1),
+    LVO_RVO_ratio:exportNum(lvoRvo,2),PDAd_mm_per_kg:exportNum(kg>0&&pdad!=null?pdad*10/kg:NaN,2),
+    PLASE_v1_pct:exportNum(v1*100,1),PLASE_v2_pct:exportNum(v2*100,1),NT_proBNP_GA_risk_pct:exportNum(ntm*100,1),
+    IOWA_score_out_of_14:iowaComplete?iowaValues.reduce((a,b)=>a+b,0):'',IOWA_complete_7_of_7:iowaComplete?'Yes':'No',
+    cTAPSE_pct:exportNum(rvAssessment.ctapse,1),TAPSE_Z_score:exportNum(rvAssessment.z,2),TAPSE_reference:rvAssessment.label||''
+  };
+  refreshExcelPreview();
   ids.forEach(id=>localStorage.setItem('neo_'+id,$(id).value));
 }
 function setPattern(id,yes){const e=$(id); if(yes){e.textContent='YES';e.className='badge yes'}else{e.textContent='—';e.className='badge ok'}}
